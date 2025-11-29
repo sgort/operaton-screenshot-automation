@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Output
+output/
+coverage/
+
+# Build artifacts
+dist/
+build/
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# BPMN/DMN files (XML formatting differs)
+*.bpmn
+*.dmn
+*.cmmn
+
+# Generated files
+*.min.js
+*.map
