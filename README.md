@@ -1,4 +1,16 @@
-# Operaton Documentation Screenshot Automation
+# ⚠️ Operaton Documentation Screenshot Automation ⚠️
+
+[![Work in Progress](https://img.shields.io/badge/status-work%20in%20progress-orange)](https://github.com/operaton/operaton-screenshot-automation)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
+
+> 🚧 **Work in Progress — Baseline Under Development** 🚧
+>
+> This repository is a **baseline toolkit** intended to be battle-tested in practice. APIs, scripts,
+> and automation may change frequently. **Not ready for production use**.
+>
+> Contributions, testing, and feedback are highly encouraged to improve the project.
+
+---
 
 Automated toolkit for capturing Operaton webapp screenshots to replace Camunda screenshots in
 documentation.
