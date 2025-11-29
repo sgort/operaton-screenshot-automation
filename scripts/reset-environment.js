@@ -2,7 +2,7 @@
 
 /**
  * Reset Operaton Environment
- * 
+ *
  * Deletes:
  * - All process instances (running and completed)
  * - All deployments
@@ -27,12 +27,12 @@ const api = axios.create({
   baseURL: config.baseUrl,
   auth: {
     username: config.username,
-    password: config.password
+    password: config.password,
   },
   headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  }
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
 });
 
 // Parse command line arguments
@@ -50,19 +50,19 @@ const CREATED_GROUPS = ['accounting', 'management', 'sales'];
 /**
  * Delay helper
  */
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
  * Ask for confirmation
  */
 async function confirm(message) {
   if (forceMode) return true;
-  
+
   const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
   });
-  
+
   return new Promise(resolve => {
     rl.question(`${message} [y/N] `, answer => {
       rl.close();
@@ -80,32 +80,32 @@ async function confirm(message) {
  */
 async function deleteProcessInstances() {
   console.log('\n🗑️  Deleting process instances...');
-  
+
   try {
     // Get all running instances
     const response = await api.get('/process-instance', { params: { maxResults: 1000 } });
     const instances = response.data;
-    
+
     if (instances.length === 0) {
       console.log('  No running instances found');
       return 0;
     }
-    
+
     console.log(`  Found ${instances.length} running instance(s)`);
-    
+
     // Delete each instance
     let deleted = 0;
     for (const instance of instances) {
       try {
         await api.delete(`/process-instance/${instance.id}`, {
-          params: { skipCustomListeners: true, skipIoMappings: true }
+          params: { skipCustomListeners: true, skipIoMappings: true },
         });
         deleted++;
       } catch (error) {
         // Try force delete
         try {
           await api.delete(`/process-instance/${instance.id}`, {
-            params: { skipCustomListeners: true, skipIoMappings: true, skipSubprocesses: true }
+            params: { skipCustomListeners: true, skipIoMappings: true, skipSubprocesses: true },
           });
           deleted++;
         } catch (e) {
@@ -113,7 +113,7 @@ async function deleteProcessInstances() {
         }
       }
     }
-    
+
     console.log(`  ✓ Deleted ${deleted} process instance(s)`);
     return deleted;
   } catch (error) {
@@ -127,19 +127,19 @@ async function deleteProcessInstances() {
  */
 async function deleteHistoricInstances() {
   console.log('\n🗑️  Deleting historic process instances...');
-  
+
   try {
     // Get all historic instances
     const response = await api.get('/history/process-instance', { params: { maxResults: 1000 } });
     const instances = response.data;
-    
+
     if (instances.length === 0) {
       console.log('  No historic instances found');
       return 0;
     }
-    
+
     console.log(`  Found ${instances.length} historic instance(s)`);
-    
+
     // Delete each instance
     let deleted = 0;
     for (const instance of instances) {
@@ -150,7 +150,7 @@ async function deleteHistoricInstances() {
         console.log(`  ⚠ Could not delete historic instance ${instance.id}`);
       }
     }
-    
+
     console.log(`  ✓ Deleted ${deleted} historic instance(s)`);
     return deleted;
   } catch (error) {
@@ -164,34 +164,36 @@ async function deleteHistoricInstances() {
  */
 async function deleteDeployments() {
   console.log('\n🗑️  Deleting deployments...');
-  
+
   try {
     // Get all deployments
     const response = await api.get('/deployment');
     const deployments = response.data;
-    
+
     if (deployments.length === 0) {
       console.log('  No deployments found');
       return 0;
     }
-    
+
     console.log(`  Found ${deployments.length} deployment(s)`);
-    
+
     // Delete each deployment
     let deleted = 0;
     for (const deployment of deployments) {
       try {
         await api.delete(`/deployment/${deployment.id}`, {
-          params: { cascade: true, skipCustomListeners: true, skipIoMappings: true }
+          params: { cascade: true, skipCustomListeners: true, skipIoMappings: true },
         });
         deleted++;
         console.log(`    Deleted: ${deployment.name || deployment.id}`);
       } catch (error) {
-        console.log(`  ⚠ Could not delete deployment ${deployment.id}: ${error.response?.data?.message || error.message}`);
+        console.log(
+          `  ⚠ Could not delete deployment ${deployment.id}: ${error.response?.data?.message || error.message}`
+        );
       }
       await delay(100);
     }
-    
+
     console.log(`  ✓ Deleted ${deleted} deployment(s)`);
     return deleted;
   } catch (error) {
@@ -205,18 +207,18 @@ async function deleteDeployments() {
  */
 async function deleteBatches() {
   console.log('\n🗑️  Deleting batches...');
-  
+
   try {
     const response = await api.get('/batch');
     const batches = response.data;
-    
+
     if (batches.length === 0) {
       console.log('  No batches found');
       return 0;
     }
-    
+
     console.log(`  Found ${batches.length} batch(es)`);
-    
+
     let deleted = 0;
     for (const batch of batches) {
       try {
@@ -226,7 +228,7 @@ async function deleteBatches() {
         console.log(`  ⚠ Could not delete batch ${batch.id}`);
       }
     }
-    
+
     console.log(`  ✓ Deleted ${deleted} batch(es)`);
     return deleted;
   } catch (error) {
@@ -240,16 +242,16 @@ async function deleteBatches() {
  */
 async function deleteHistoricBatches() {
   console.log('\n🗑️  Deleting historic batches...');
-  
+
   try {
     const response = await api.get('/history/batch');
     const batches = response.data;
-    
+
     if (batches.length === 0) {
       console.log('  No historic batches found');
       return 0;
     }
-    
+
     let deleted = 0;
     for (const batch of batches) {
       try {
@@ -259,7 +261,7 @@ async function deleteHistoricBatches() {
         // Ignore
       }
     }
-    
+
     console.log(`  ✓ Deleted ${deleted} historic batch(es)`);
     return deleted;
   } catch (error) {
@@ -272,7 +274,7 @@ async function deleteHistoricBatches() {
  */
 async function deleteUsers() {
   console.log('\n🗑️  Deleting created users...');
-  
+
   let deleted = 0;
   for (const userId of CREATED_USERS) {
     try {
@@ -285,7 +287,7 @@ async function deleteUsers() {
       }
     }
   }
-  
+
   console.log(`  ✓ Deleted ${deleted} user(s)`);
   return deleted;
 }
@@ -295,7 +297,7 @@ async function deleteUsers() {
  */
 async function deleteGroups() {
   console.log('\n🗑️  Deleting created groups...');
-  
+
   let deleted = 0;
   for (const groupId of CREATED_GROUPS) {
     try {
@@ -308,7 +310,7 @@ async function deleteGroups() {
       }
     }
   }
-  
+
   console.log(`  ✓ Deleted ${deleted} group(s)`);
   return deleted;
 }
@@ -318,18 +320,18 @@ async function deleteGroups() {
  */
 async function deleteDecisionInstances() {
   console.log('\n🗑️  Deleting decision instances...');
-  
+
   try {
     const response = await api.get('/history/decision-instance', { params: { maxResults: 1000 } });
     const instances = response.data;
-    
+
     if (instances.length === 0) {
       console.log('  No decision instances found');
       return 0;
     }
-    
+
     console.log(`  Found ${instances.length} decision instance(s)`);
-    
+
     let deleted = 0;
     for (const instance of instances) {
       try {
@@ -339,7 +341,7 @@ async function deleteDecisionInstances() {
         // Some may not be deletable individually
       }
     }
-    
+
     console.log(`  ✓ Deleted ${deleted} decision instance(s)`);
     return deleted;
   } catch (error) {
@@ -352,18 +354,18 @@ async function deleteDecisionInstances() {
  */
 async function deleteJobs() {
   console.log('\n🗑️  Deleting jobs...');
-  
+
   try {
     const response = await api.get('/job', { params: { maxResults: 1000 } });
     const jobs = response.data;
-    
+
     if (jobs.length === 0) {
       console.log('  No jobs found');
       return 0;
     }
-    
+
     console.log(`  Found ${jobs.length} job(s)`);
-    
+
     let deleted = 0;
     for (const job of jobs) {
       try {
@@ -373,7 +375,7 @@ async function deleteJobs() {
         // Some jobs can't be deleted directly
       }
     }
-    
+
     console.log(`  ✓ Deleted ${deleted} job(s)`);
     return deleted;
   } catch (error) {
@@ -390,7 +392,7 @@ async function main() {
   console.log('  Operaton Environment Reset');
   console.log('═'.repeat(60));
   console.log(`\nTarget: ${config.baseUrl}`);
-  
+
   // Test connection
   try {
     await api.get('/engine');
@@ -399,10 +401,10 @@ async function main() {
     console.error('✗ Failed to connect to Operaton:', error.message);
     process.exit(1);
   }
-  
+
   // Determine what to delete
   const deleteAll = !instancesOnly && !deploymentsOnly && !usersOnly && !historyOnly;
-  
+
   // Confirm action
   let confirmMessage = 'This will delete ';
   if (deleteAll) {
@@ -416,16 +418,16 @@ async function main() {
     confirmMessage += parts.join(', ');
   }
   confirmMessage += '. Continue?';
-  
+
   if (!forceMode) {
     console.log('\n⚠️  WARNING: This action cannot be undone!\n');
   }
-  
-  if (!await confirm(confirmMessage)) {
+
+  if (!(await confirm(confirmMessage))) {
     console.log('\nAborted.');
     process.exit(0);
   }
-  
+
   const stats = {
     instances: 0,
     historicInstances: 0,
@@ -434,25 +436,25 @@ async function main() {
     groups: 0,
     batches: 0,
     jobs: 0,
-    decisions: 0
+    decisions: 0,
   };
-  
+
   // Execute deletions based on flags
   if (deleteAll || instancesOnly) {
     stats.jobs = await deleteJobs();
     stats.instances = await deleteProcessInstances();
   }
-  
+
   if (deleteAll || historyOnly) {
     stats.historicInstances = await deleteHistoricInstances();
     stats.decisions = await deleteDecisionInstances();
     await deleteHistoricBatches();
   }
-  
+
   if (deleteAll) {
     stats.batches = await deleteBatches();
   }
-  
+
   if (deleteAll || deploymentsOnly) {
     // Need to delete instances first before deployments
     if (!instancesOnly && !deleteAll) {
@@ -462,14 +464,14 @@ async function main() {
     }
     stats.deployments = await deleteDeployments();
   }
-  
+
   if (deleteAll || usersOnly) {
     stats.users = await deleteUsers();
     stats.groups = await deleteGroups();
   }
-  
+
   // Print summary
-  console.log('\n' + '═'.repeat(60));
+  console.log(`\n${'═'.repeat(60)}`);
   console.log('  Reset Summary');
   console.log('═'.repeat(60));
   console.log(`  Process instances deleted:  ${stats.instances}`);
@@ -481,7 +483,7 @@ async function main() {
   console.log(`  Jobs deleted:               ${stats.jobs}`);
   console.log(`  Decision instances deleted: ${stats.decisions}`);
   console.log('═'.repeat(60));
-  
+
   console.log('\n✓ Environment reset complete');
   console.log('\nTo start fresh, run:');
   console.log('  make deploy     # Deploy processes');

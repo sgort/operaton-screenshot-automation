@@ -16,16 +16,16 @@ const config = {
 
 async function checkRestApi() {
   console.log(`\nChecking REST API: ${config.baseUrl}`);
-  
+
   try {
     const response = await axios.get(`${config.baseUrl}/engine`, {
       auth: {
         username: config.username,
-        password: config.password
+        password: config.password,
       },
-      timeout: 10000
+      timeout: 10000,
     });
-    
+
     const engines = response.data;
     console.log('  ✓ REST API accessible');
     console.log(`  ✓ Engine(s): ${engines.map(e => e.name).join(', ')}`);
@@ -50,21 +50,23 @@ async function checkRestApi() {
 
 async function checkWebApps() {
   console.log(`\nChecking Web Apps: ${config.webUrl}`);
-  
+
   const apps = ['cockpit', 'tasklist', 'admin'];
-  
+
   for (const app of apps) {
     const url = `${config.webUrl}/operaton/app/${app}/default/`;
     try {
-      const response = await axios.get(url, { 
+      const response = await axios.get(url, {
         timeout: 10000,
-        maxRedirects: 5
+        maxRedirects: 5,
       });
       console.log(`  ✓ ${app.charAt(0).toUpperCase() + app.slice(1)} accessible`);
     } catch (error) {
       if (error.response?.status === 401 || error.response?.status === 302) {
         // Login page or redirect is expected
-        console.log(`  ✓ ${app.charAt(0).toUpperCase() + app.slice(1)} accessible (requires login)`);
+        console.log(
+          `  ✓ ${app.charAt(0).toUpperCase() + app.slice(1)} accessible (requires login)`
+        );
       } else {
         console.log(`  ✗ ${app.charAt(0).toUpperCase() + app.slice(1)} not accessible`);
       }
@@ -74,13 +76,13 @@ async function checkWebApps() {
 
 async function checkVersion() {
   console.log('\nChecking Version Info:');
-  
+
   try {
     const response = await axios.get(`${config.baseUrl}/version`, {
       auth: {
         username: config.username,
-        password: config.password
-      }
+        password: config.password,
+      },
     });
     console.log(`  Version: ${response.data.version || 'unknown'}`);
   } catch {
@@ -92,14 +94,14 @@ async function main() {
   console.log('═'.repeat(50));
   console.log('  Operaton Connection Check');
   console.log('═'.repeat(50));
-  
+
   const restOk = await checkRestApi();
-  
+
   if (restOk) {
     await checkVersion();
     await checkWebApps();
-    
-    console.log('\n' + '═'.repeat(50));
+
+    console.log(`\n${'═'.repeat(50)}`);
     console.log('  ✓ Connection successful!');
     console.log('═'.repeat(50));
     console.log('\nYou can now run:');
@@ -107,7 +109,7 @@ async function main() {
     console.log('  make data     # Generate test data');
     console.log('  make capture  # Capture screenshots');
   } else {
-    console.log('\n' + '═'.repeat(50));
+    console.log(`\n${'═'.repeat(50)}`);
     console.log('  ✗ Connection failed');
     console.log('═'.repeat(50));
     console.log('\nTroubleshooting:');
