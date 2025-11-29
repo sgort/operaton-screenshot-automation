@@ -65,38 +65,6 @@ feature/xxx, bug/xxx, chore/xxx, docs/xxx
                                ──> PR ──> main (protected stable)
 ```
 
-## 📏 Code Style & Guidelines
-
-- Follow existing code style and conventions.
-- Use meaningful variable and function names.
-- Keep commits small and focused.
-- Write tests for new features or bug fixes when applicable.
-- Run all tests before creating a PR.
-
----
-
-## 📝 Documentation
-
-- Update the README or other relevant docs if your change affects usage.
-- Use `docs/...` branches for documentation-only changes.
-
----
-
-## ✅ Pull Request Checklist
-
-- [ ] Branch off `dev`.
-- [ ] PR targets `dev` (except hotfixes targeting `main` in emergencies).
-- [ ] Make sure you're starting with clean code:
-  ```bash
-  make validate
-  ```
-- [ ] Commit messages follow the style guide.
-- [ ] Code is linted and passes all tests.
-- [ ] Documentation is updated if necessary.
-- [ ] All checks pass in CI/CD.
-
----
-
 ### Making Changes
 
 1. Write your code following the existing style
@@ -142,21 +110,26 @@ git commit -m "docs: update README with new commands"
 git commit -m "chore(deps): update puppeteer to v24"
 ```
 
-### Submitting Changes
+### ✅ Pull Request Checklist
 
-1. Push your branch:
+- [ ] Branch off `dev`.
+- [ ] PR targets `dev` (except hotfixes targeting `main` in emergencies).
+- [ ] Make sure you're starting with clean code:
+  ```bash
+  make validate
+  ```
+- [ ] Commit messages follow the style guide.
+- [ ] Code is linted and passes all tests.
+- [ ] Documentation is updated if necessary.
+- [ ] All checks pass in CI/CD.
 
-   ```bash
-   git push origin feat/your-feature-name
-   ```
+### 📏 Code Style & Guidelines
 
-2. Create a Pull Request on GitHub
-
-3. Wait for CI checks to pass
-
-4. Request a review
-
-## Code Style
+- Follow existing code style and conventions.
+- Use meaningful variable and function names.
+- Keep commits small and focused.
+- Write tests for new features or bug fixes when applicable.
+- Run all tests before creating a PR.
 
 ### JavaScript
 
