@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 
 /**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright 2025 Operaton
+ *
  * Capture screenshots of Operaton webapps
- * 
+ *
  * Uses Puppeteer to:
  * 1. Login to Operaton
  * 2. Navigate to various pages
@@ -29,11 +32,11 @@ const config = {
   password: process.env.OPERATON_PASSWORD || 'demo',
   viewport: {
     width: parseInt(process.env.SCREENSHOT_WIDTH) || 1920,
-    height: parseInt(process.env.SCREENSHOT_HEIGHT) || 1080
+    height: parseInt(process.env.SCREENSHOT_HEIGHT) || 1080,
   },
   deviceScaleFactor: parseInt(process.env.SCREENSHOT_SCALE) || 2,
   headless: process.env.HEADLESS !== 'false',
-  debug: process.env.DEBUG === 'true'
+  debug: process.env.DEBUG === 'true',
 };
 
 // API client for dynamic data
@@ -41,8 +44,8 @@ const api = axios.create({
   baseURL: config.restUrl,
   auth: {
     username: config.username,
-    password: config.password
-  }
+    password: config.password,
+  },
 });
 
 /**
@@ -52,25 +55,25 @@ async function getDynamicData() {
   const data = {
     processInstances: [],
     tasks: [],
-    decisionInstances: []
+    decisionInstances: [],
   };
-  
+
   try {
     // Get running process instances
     const instances = await api.get('/process-instance', { params: { maxResults: 10 } });
     data.processInstances = instances.data;
-    
+
     // Get tasks
     const tasks = await api.get('/task', { params: { maxResults: 10 } });
     data.tasks = tasks.data;
-    
+
     // Get decision instances
     const decisions = await api.get('/history/decision-instance', { params: { maxResults: 10 } });
     data.decisionInstances = decisions.data;
   } catch (error) {
     console.warn('Warning: Could not fetch dynamic data:', error.message);
   }
-  
+
   return data;
 }
 
@@ -79,27 +82,27 @@ async function getDynamicData() {
  */
 async function login(page, app = 'cockpit') {
   const loginUrl = `${config.baseUrl}/operaton/app/${app}/default/`;
-  
+
   console.log(`  Navigating to: ${loginUrl}`);
   await page.goto(loginUrl, { waitUntil: 'networkidle2', timeout: 30000 });
-  
+
   // Wait for login form or check if already logged in
   try {
     // Check if we're on the login page
     const loginForm = await page.$('form[name="login"]');
     if (loginForm) {
       console.log('  Logging in...');
-      
+
       // Fill in credentials
       await page.type('input[name="username"]', config.username);
       await page.type('input[name="password"]', config.password);
-      
+
       // Submit form
       await Promise.all([
         page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 30000 }),
-        page.click('button[type="submit"]')
+        page.click('button[type="submit"]'),
       ]);
-      
+
       console.log('  ✓ Logged in successfully');
     } else {
       console.log('  ✓ Already logged in');
@@ -107,7 +110,7 @@ async function login(page, app = 'cockpit') {
   } catch (error) {
     console.warn('  ⚠ Login handling:', error.message);
   }
-  
+
   // Wait for app to load
   await page.waitForTimeout(2000);
 }
@@ -117,10 +120,10 @@ async function login(page, app = 'cockpit') {
  */
 async function navigateTo(page, path, waitForSelector = null) {
   const url = path.startsWith('http') ? path : `${config.baseUrl}${path}`;
-  
+
   console.log(`  Navigating to: ${url}`);
   await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
-  
+
   if (waitForSelector) {
     try {
       await page.waitForSelector(waitForSelector, { timeout: 10000 });
@@ -128,7 +131,7 @@ async function navigateTo(page, path, waitForSelector = null) {
       console.warn(`  ⚠ Selector not found: ${waitForSelector}`);
     }
   }
-  
+
   // Give page time to fully render
   await page.waitForTimeout(1500);
 }
@@ -138,16 +141,16 @@ async function navigateTo(page, path, waitForSelector = null) {
  */
 async function takeScreenshot(page, outputPath, options = {}) {
   const fullPath = path.join(OUTPUT_DIR, outputPath);
-  
+
   // Ensure directory exists
   await fs.mkdir(path.dirname(fullPath), { recursive: true });
-  
+
   const screenshotOptions = {
     path: fullPath,
     type: 'png',
-    ...options
+    ...options,
   };
-  
+
   // If selector is specified, screenshot just that element
   if (options.selector) {
     const element = await page.$(options.selector);
@@ -160,7 +163,7 @@ async function takeScreenshot(page, outputPath, options = {}) {
   } else {
     await page.screenshot(screenshotOptions);
   }
-  
+
   console.log(`  ✓ Screenshot saved: ${outputPath}`);
   return fullPath;
 }
@@ -180,7 +183,7 @@ async function executeActions(page, actions) {
           console.warn('  ⚠ Heatmap toggle not found');
         }
         break;
-        
+
       case 'openCreateFilterDialog':
         try {
           await page.click('[ng-click="createFilter()"]');
@@ -190,7 +193,7 @@ async function executeActions(page, actions) {
           console.warn('  ⚠ Create filter dialog not found');
         }
         break;
-        
+
       case 'openFilterDetail':
         try {
           await page.click('.filter-name');
@@ -199,7 +202,7 @@ async function executeActions(page, actions) {
           console.warn('  ⚠ Filter detail not found');
         }
         break;
-        
+
       default:
         console.warn(`  ⚠ Unknown action: ${action}`);
     }
@@ -211,25 +214,28 @@ async function executeActions(page, actions) {
  */
 function resolvePath(pathTemplate, variables, dynamicData) {
   let resolvedPath = pathTemplate;
-  
+
   // Replace static variables
   for (const [key, value] of Object.entries(variables || {})) {
     resolvedPath = resolvedPath.replace(`{${key}}`, value);
   }
-  
+
   // Replace dynamic variables
   if (resolvedPath.includes('{processInstanceId}') && dynamicData.processInstances.length > 0) {
     resolvedPath = resolvedPath.replace('{processInstanceId}', dynamicData.processInstances[0].id);
   }
-  
+
   if (resolvedPath.includes('{taskId}') && dynamicData.tasks.length > 0) {
     resolvedPath = resolvedPath.replace('{taskId}', dynamicData.tasks[0].id);
   }
-  
+
   if (resolvedPath.includes('{decisionInstanceId}') && dynamicData.decisionInstances.length > 0) {
-    resolvedPath = resolvedPath.replace('{decisionInstanceId}', dynamicData.decisionInstances[0].id);
+    resolvedPath = resolvedPath.replace(
+      '{decisionInstanceId}',
+      dynamicData.decisionInstances[0].id
+    );
   }
-  
+
   return resolvedPath;
 }
 
@@ -238,39 +244,39 @@ function resolvePath(pathTemplate, variables, dynamicData) {
  */
 async function captureScreenshot(page, screenshot, configData, dynamicData) {
   console.log(`\n📸 ${screenshot.id}: ${screenshot.description}`);
-  
+
   const category = configData.categories[screenshot.category];
   if (!category) {
     console.error(`  ✗ Unknown category: ${screenshot.category}`);
     return false;
   }
-  
+
   // Build full URL
   const resolvedPath = resolvePath(screenshot.path, screenshot.variables, dynamicData);
-  
+
   // Check if path has unresolved variables
   if (resolvedPath.includes('{')) {
     console.warn(`  ⚠ Skipping - unresolved variables in path: ${resolvedPath}`);
     return false;
   }
-  
+
   const fullPath = `${category.baseUrl}${resolvedPath}`;
-  
+
   try {
     // Navigate to page
     await navigateTo(page, fullPath, screenshot.waitForSelector);
-    
+
     // Execute any pre-screenshot actions
     if (screenshot.actions) {
       await executeActions(page, screenshot.actions);
     }
-    
+
     // Take screenshot
     await takeScreenshot(page, screenshot.outputFile, {
       selector: screenshot.selector,
-      fullPage: screenshot.fullPage
+      fullPage: screenshot.fullPage,
     });
-    
+
     return true;
   } catch (error) {
     console.error(`  ✗ Failed: ${error.message}`);
@@ -288,17 +294,17 @@ async function main() {
   console.log(`\nTarget: ${config.baseUrl}`);
   console.log(`Output: ${OUTPUT_DIR}`);
   console.log(`Headless: ${config.headless}\n`);
-  
+
   // Load configuration
   const configData = JSON.parse(await fs.readFile(CONFIG_PATH, 'utf8'));
-  
+
   // Get dynamic data
   console.log('📊 Fetching dynamic data...');
   const dynamicData = await getDynamicData();
   console.log(`  Process instances: ${dynamicData.processInstances.length}`);
   console.log(`  Tasks: ${dynamicData.tasks.length}`);
   console.log(`  Decision instances: ${dynamicData.decisionInstances.length}`);
-  
+
   // Launch browser
   console.log('\n🌐 Launching browser...');
   const browser = await puppeteer.launch({
@@ -307,36 +313,36 @@ async function main() {
       '--no-sandbox',
       '--disable-setuid-sandbox',
       '--disable-dev-shm-usage',
-      `--window-size=${config.viewport.width},${config.viewport.height}`
-    ]
+      `--window-size=${config.viewport.width},${config.viewport.height}`,
+    ],
   });
-  
+
   const page = await browser.newPage();
-  
+
   // Set viewport
   await page.setViewport({
     width: config.viewport.width,
     height: config.viewport.height,
-    deviceScaleFactor: config.deviceScaleFactor
+    deviceScaleFactor: config.deviceScaleFactor,
   });
-  
+
   // Track results
   const results = {
     captured: [],
     skipped: [],
-    failed: []
+    failed: [],
   };
-  
+
   try {
     // Login to Cockpit first
     console.log('\n🔐 Logging in to Cockpit...');
     await login(page, 'cockpit');
-    
+
     // Process each screenshot
     for (const screenshot of configData.screenshots) {
       // Check if we need to switch apps
       const category = configData.categories[screenshot.category];
-      
+
       // Simple app switching - just navigate to the right app
       if (category.baseUrl.includes('/tasklist/')) {
         await login(page, 'tasklist');
@@ -345,16 +351,15 @@ async function main() {
       } else if (category.baseUrl.includes('/welcome/')) {
         await login(page, 'welcome');
       }
-      
+
       const success = await captureScreenshot(page, screenshot, configData, dynamicData);
-      
+
       if (success) {
         results.captured.push(screenshot.id);
       } else {
         results.failed.push(screenshot.id);
       }
     }
-    
   } catch (error) {
     console.error('\n✗ Fatal error:', error.message);
     if (config.debug) {
@@ -363,21 +368,21 @@ async function main() {
   } finally {
     await browser.close();
   }
-  
+
   // Print summary
-  console.log('\n' + '═'.repeat(60));
+  console.log(`\n${'═'.repeat(60)}`);
   console.log('  Capture Summary');
   console.log('═'.repeat(60));
   console.log(`  Captured: ${results.captured.length}`);
   console.log(`  Skipped:  ${results.skipped.length}`);
   console.log(`  Failed:   ${results.failed.length}`);
-  console.log('═'.repeat(60) + '\n');
-  
+  console.log(`${'═'.repeat(60)}\n`);
+
   if (results.failed.length > 0) {
     console.log('Failed screenshots:');
     results.failed.forEach(id => console.log(`  - ${id}`));
   }
-  
+
   console.log('\nScreenshots saved to:', OUTPUT_DIR);
   console.log('');
 }

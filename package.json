@@ -2,6 +2,13 @@
   "name": "operaton-screenshot-automation",
   "version": "1.0.0",
   "description": "Automated screenshot capture for Operaton documentation",
+  "license": "Apache-2.0",
+  "author": "Operaton",
+  "homepage": "https://operaton.org/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/operaton/operaton-screenshot-automation.git"
+  },
   "type": "module",
   "engines": {
     "node": ">=18.0.0"
@@ -30,49 +37,46 @@
     "reset:deployments": "node scripts/reset-environment.js --deployments-only",
     "quick": "npm run deploy && npm run data && npm run capture",
     "full": "npm run deploy && npm run data && npm run simulate && npm run incidents && npm run capture",
-
     "lint": "eslint scripts/",
     "lint:fix": "eslint scripts/ --fix",
-    "format": "prettier --write \"scripts/**/*.js\" \"config/**/*.json\" \"*.md\"",
     "format:check": "prettier --check \"scripts/**/*.js\" \"config/**/*.json\" \"*.md\"",
+    "format": "prettier --write \"scripts/**/*.js\" \"config/**/*.json\" \"*.md\"",
     "validate": "npm run lint && npm run format:check",
-
     "deps:check": "ncu",
     "deps:update": "ncu -u && npm install",
     "deps:update:minor": "ncu -u --target minor && npm install",
     "deps:audit": "npm audit",
     "deps:audit:fix": "npm audit fix",
-
-    "prepare": "husky || true",
+    "prepare": "husky install",
     "test": "echo \"No tests yet\" && exit 0"
   },
   "dependencies": {
     "axios": "^1.7.9",
-    "dotenv": "^16.4.7",
+    "dotenv": "^17.2.3",
     "form-data": "^4.0.1",
-    "glob": "^11.0.0",
+    "glob": "^13.0.0",
     "puppeteer": "^24.15.0"
   },
   "devDependencies": {
-    "cross-env": "^7.0.3",
+    "cross-env": "^10.1.0",
     "eslint": "^9.17.0",
-    "eslint-config-prettier": "^9.1.0",
-    "globals": "^15.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.5.0",
     "husky": "^9.1.7",
-    "lint-staged": "^15.2.11",
-    "npm-check-updates": "^17.1.11",
+    "lint-staged": "^16.2.7",
+    "npm-check-updates": "^19.1.2",
     "prettier": "^3.4.2"
   },
   "lint-staged": {
-    "scripts/**/*.js": [
+    "**/*.js": [
       "eslint --fix",
       "prettier --write"
     ],
-    "config/**/*.json": [
-      "prettier --write"
-    ],
-    "*.md": [
-      "prettier --write"
-    ]
+    "**/*.{json,md}": "prettier --write"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npx lint-staged"
+    }
   }
 }

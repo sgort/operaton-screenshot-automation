@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * Create intentional incidents for screenshot capture
- * 
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright 2025 Operaton
+
+* Create intentional incidents for screenshot capture
+ *
  * Generates various error states:
  * - Failed script tasks
  * - Failed service tasks
@@ -14,7 +17,7 @@
 import 'dotenv/config';
 import axios from 'axios';
 import FormData from 'form-data';
-import fs from 'fs/promises';
+import _fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -32,12 +35,12 @@ const api = axios.create({
   baseURL: config.baseUrl,
   auth: {
     username: config.username,
-    password: config.password
+    password: config.password,
   },
   headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  }
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
 });
 
 // Parse command line arguments
@@ -50,24 +53,24 @@ const createJobErrors = args.includes('--job-errors') || args.length === 0;
 /**
  * Delay helper
  */
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
  * Deploy a BPMN process
  */
 async function deployProcess(name, bpmnXml) {
   const form = new FormData();
-  
+
   form.append('deployment-name', name);
   form.append('enable-duplicate-filtering', 'false');
   form.append('upload', Buffer.from(bpmnXml), {
     filename: `${name}.bpmn`,
-    contentType: 'application/octet-stream'
+    contentType: 'application/octet-stream',
   });
-  
+
   try {
     const response = await api.post('/deployment/create', form, {
-      headers: form.getHeaders()
+      headers: form.getHeaders(),
     });
     console.log(`  ✓ Deployed: ${name}`);
     return response.data;
@@ -90,16 +93,16 @@ async function startProcess(processKey, variables = {}, businessKey = null) {
           if (typeof value === 'boolean') type = 'Boolean';
           return [key, { value, type }];
         })
-      )
+      ),
     };
-    
+
     if (businessKey) {
       payload.businessKey = businessKey;
     }
-    
+
     const response = await api.post(`/process-definition/key/${processKey}/start`, payload);
     return response.data;
-  } catch (error) {
+  } catch {
     // Expected for some error scenarios
     return null;
   }
@@ -112,7 +115,7 @@ async function getIncidents() {
   try {
     const response = await api.get('/incident');
     return response.data;
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -122,11 +125,11 @@ async function getIncidents() {
  */
 async function getFailedJobs() {
   try {
-    const response = await api.get('/job', { 
-      params: { withException: true } 
+    const response = await api.get('/job', {
+      params: { withException: true },
     });
     return response.data;
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -283,120 +286,123 @@ const EXTERNAL_TASK_PROCESS = `<?xml version="1.0" encoding="UTF-8"?>
 
 async function createScriptIncidents() {
   console.log('\n📛 Creating Script Task Incidents\n');
-  
+
   // Deploy failing script process
   await deployProcess('failing-script-process', FAILING_SCRIPT_PROCESS);
   await delay(500);
-  
+
   // Start instances (they will fail at the script task)
   for (let i = 0; i < 3; i++) {
     console.log(`  Starting failing script instance ${i + 1}...`);
     await startProcess('failing-script-process', {}, `SCRIPT-FAIL-${Date.now()}-${i}`);
     await delay(300);
   }
-  
+
   console.log('  ✓ Script task incidents created');
 }
 
 async function createServiceIncidents() {
   console.log('\n📛 Creating Service Task Incidents\n');
-  
+
   // Deploy failing service process
   await deployProcess('failing-service-process', FAILING_SERVICE_PROCESS);
   await delay(500);
-  
+
   // Start instances
   for (let i = 0; i < 2; i++) {
     console.log(`  Starting failing service instance ${i + 1}...`);
     await startProcess('failing-service-process', {}, `SERVICE-FAIL-${Date.now()}-${i}`);
     await delay(300);
   }
-  
+
   console.log('  ✓ Service task incidents created');
 }
 
 async function createExpressionIncidents() {
   console.log('\n📛 Creating Expression Evaluation Incidents\n');
-  
+
   // Deploy process with bad expression
   await deployProcess('failing-expression-process', FAILING_EXPRESSION_PROCESS);
   await delay(500);
-  
+
   // Start without required variable
   console.log('  Starting instance without required variable...');
   await startProcess('failing-expression-process', {}, `EXPR-FAIL-${Date.now()}`);
-  
+
   console.log('  ✓ Expression evaluation incidents created');
 }
 
 async function createJobIncidents() {
   console.log('\n📛 Creating Async Job Incidents\n');
-  
+
   // Deploy async failing process
   await deployProcess('failing-job-process', FAILING_JOB_PROCESS);
   await delay(500);
-  
+
   // Start instances
   for (let i = 0; i < 2; i++) {
     console.log(`  Starting async failing instance ${i + 1}...`);
     await startProcess('failing-job-process', {}, `JOB-FAIL-${Date.now()}-${i}`);
     await delay(500);
   }
-  
+
   // Wait for jobs to be executed and fail
   console.log('  Waiting for job execution...');
   await delay(2000);
-  
+
   console.log('  ✓ Async job incidents created');
 }
 
 async function createExternalTaskIncidents() {
   console.log('\n📛 Creating External Task Incidents\n');
-  
+
   // Deploy external task process
   await deployProcess('external-task-process', EXTERNAL_TASK_PROCESS);
   await delay(500);
-  
+
   // Start instances (they will wait for external workers)
   for (let i = 0; i < 2; i++) {
     console.log(`  Starting external task instance ${i + 1}...`);
     await startProcess('external-task-process', {}, `EXT-TASK-${Date.now()}-${i}`);
     await delay(300);
   }
-  
+
   // Fetch and fail external tasks
   console.log('  Fetching external tasks to fail them...');
   await delay(500);
-  
+
   try {
     // Fetch external tasks
     const fetchResponse = await api.post('/external-task/fetchAndLock', {
       workerId: 'incident-creator',
       maxTasks: 5,
-      topics: [{
-        topicName: 'incident-demo-topic',
-        lockDuration: 60000
-      }]
+      topics: [
+        {
+          topicName: 'incident-demo-topic',
+          lockDuration: 60000,
+        },
+      ],
     });
-    
+
     const tasks = fetchResponse.data;
     console.log(`  Found ${tasks.length} external tasks`);
-    
+
     // Fail each task
     for (const task of tasks) {
       await api.post(`/external-task/${task.id}/failure`, {
         workerId: 'incident-creator',
         errorMessage: 'Intentional failure for incident demo',
-        errorDetails: 'This external task was intentionally failed to demonstrate incident handling in the Operaton webapps.',
+        errorDetails:
+          'This external task was intentionally failed to demonstrate incident handling in the Operaton webapps.',
         retries: 0,
-        retryTimeout: 0
+        retryTimeout: 0,
       });
       console.log(`  ✓ Failed external task ${task.id}`);
     }
   } catch (error) {
     console.log(`  ⚠ Could not fail external tasks: ${error.message}`);
   }
-  
+
   console.log('  ✓ External task incidents created');
 }
 
@@ -405,16 +411,16 @@ async function createExternalTaskIncidents() {
 // ============================================================================
 
 async function printSummary() {
-  console.log('\n' + '─'.repeat(60));
+  console.log(`\n${'─'.repeat(60)}`);
   console.log('  Incident Summary');
   console.log('─'.repeat(60));
-  
+
   const incidents = await getIncidents();
   const failedJobs = await getFailedJobs();
-  
+
   console.log(`\n  Total incidents: ${incidents.length}`);
   console.log(`  Failed jobs: ${failedJobs.length}`);
-  
+
   if (incidents.length > 0) {
     // Group by type
     const byType = {};
@@ -422,14 +428,14 @@ async function printSummary() {
       const type = incident.incidentType || 'unknown';
       byType[type] = (byType[type] || 0) + 1;
     }
-    
+
     console.log('\n  Incidents by type:');
     for (const [type, count] of Object.entries(byType)) {
       console.log(`    ${type}: ${count}`);
     }
   }
-  
-  console.log('\n' + '─'.repeat(60));
+
+  console.log(`\n${'─'.repeat(60)}`);
 }
 
 // ============================================================================
@@ -441,7 +447,7 @@ async function main() {
   console.log('  Operaton Incident Creator');
   console.log('═'.repeat(60));
   console.log(`\nTarget: ${config.baseUrl}`);
-  
+
   // Test connection
   try {
     await api.get('/engine');
@@ -450,28 +456,28 @@ async function main() {
     console.error('✗ Failed to connect to Operaton:', error.message);
     process.exit(1);
   }
-  
+
   // Create requested incident types
   if (createScriptErrors) {
     await createScriptIncidents();
   }
-  
+
   if (createServiceErrors) {
     await createServiceIncidents();
   }
-  
+
   if (createExpressionErrors) {
     await createExpressionIncidents();
   }
-  
+
   if (createJobErrors) {
     await createJobIncidents();
     await createExternalTaskIncidents();
   }
-  
+
   // Print summary
   await printSummary();
-  
+
   console.log('\nYour Operaton instance now has incidents for:');
   console.log('  • Cockpit incident views');
   console.log('  • Failed job drill-down');

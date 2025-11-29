@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
 /**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright 2025 Operaton
+ *
  * Show current status of Operaton environment
  */
 
@@ -17,8 +20,8 @@ const api = axios.create({
   baseURL: config.baseUrl,
   auth: {
     username: config.username,
-    password: config.password
-  }
+    password: config.password,
+  },
 });
 
 async function getCount(endpoint, params = {}) {
@@ -32,14 +35,14 @@ async function getCount(endpoint, params = {}) {
 
 async function main() {
   console.log(`Target: ${config.baseUrl}\n`);
-  
+
   try {
     await api.get('/engine');
-  } catch (error) {
+  } catch {
     console.error('✗ Cannot connect to Operaton');
     process.exit(1);
   }
-  
+
   const stats = {
     deployments: await getCount('/deployment'),
     processDefinitions: await getCount('/process-definition'),
@@ -53,7 +56,7 @@ async function main() {
     users: await getCount('/user'),
     groups: await getCount('/group'),
   };
-  
+
   console.log('Deployments:');
   console.log(`  Deployments:          ${stats.deployments}`);
   console.log(`  Process definitions:  ${stats.processDefinitions}`);

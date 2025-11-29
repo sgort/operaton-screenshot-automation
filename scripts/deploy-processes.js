@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 
 /**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright 2025 Operaton
+ *
  * Deploy BPMN/DMN/CMMN processes to Operaton
- * 
+ *
  * This script:
  * 1. Reads process definitions from config
  * 2. Deploys them to Operaton via REST API
@@ -31,11 +34,11 @@ const api = axios.create({
   baseURL: config.baseUrl,
   auth: {
     username: config.username,
-    password: config.password
+    password: config.password,
   },
   headers: {
-    'Accept': 'application/json'
-  }
+    Accept: 'application/json',
+  },
 });
 
 /**
@@ -75,33 +78,35 @@ async function getExistingDeployments() {
  */
 async function deployProcess(processConfig, filePath) {
   const form = new FormData();
-  
+
   // Read the file
   const fileContent = await fs.readFile(filePath);
   const fileName = path.basename(filePath);
-  
+
   // Add file to form
   form.append('upload', fileContent, {
     filename: fileName,
-    contentType: 'application/octet-stream'
+    contentType: 'application/octet-stream',
   });
-  
+
   // Deployment metadata
   form.append('deployment-name', processConfig.name);
   form.append('enable-duplicate-filtering', 'true');
   form.append('deploy-changed-only', 'true');
-  
+
   try {
     const response = await api.post('/deployment/create', form, {
       headers: {
-        ...form.getHeaders()
-      }
+        ...form.getHeaders(),
+      },
     });
-    
+
     console.log(`  ✓ Deployed: ${processConfig.name}`);
     console.log(`    ID: ${response.data.id}`);
-    console.log(`    Resources: ${Object.keys(response.data.deployedProcessDefinitions || {}).length} process(es)`);
-    
+    console.log(
+      `    Resources: ${Object.keys(response.data.deployedProcessDefinitions || {}).length} process(es)`
+    );
+
     return response.data;
   } catch (error) {
     console.error(`  ✗ Failed to deploy ${processConfig.name}:`, error.message);
@@ -120,15 +125,15 @@ async function deployAllProcesses() {
   const results = {
     deployed: [],
     failed: [],
-    skipped: []
+    skipped: [],
   };
-  
+
   console.log('\n📦 Deploying BPMN Processes...\n');
-  
+
   // Deploy BPMN processes
   for (const [key, process] of Object.entries(configData.processes)) {
     const filePath = path.join(__dirname, '..', process.file);
-    
+
     // Check if file exists
     try {
       await fs.access(filePath);
@@ -137,7 +142,7 @@ async function deployAllProcesses() {
       results.skipped.push({ key, reason: 'File not found' });
       continue;
     }
-    
+
     const result = await deployProcess(process, filePath);
     if (result) {
       results.deployed.push({ key, ...result });
@@ -145,13 +150,13 @@ async function deployAllProcesses() {
       results.failed.push({ key, name: process.name });
     }
   }
-  
+
   console.log('\n📊 Deploying DMN Decisions...\n');
-  
+
   // Deploy DMN decisions
   for (const [key, decision] of Object.entries(configData.decisions)) {
     const filePath = path.join(__dirname, '..', decision.file);
-    
+
     try {
       await fs.access(filePath);
     } catch {
@@ -159,7 +164,7 @@ async function deployAllProcesses() {
       results.skipped.push({ key, reason: 'File not found' });
       continue;
     }
-    
+
     const result = await deployProcess(decision, filePath);
     if (result) {
       results.deployed.push({ key, ...result });
@@ -167,7 +172,7 @@ async function deployAllProcesses() {
       results.failed.push({ key, name: decision.name });
     }
   }
-  
+
   return results;
 }
 
@@ -176,12 +181,12 @@ async function deployAllProcesses() {
  */
 async function createSampleProcesses() {
   const processesDir = path.join(__dirname, '../processes');
-  
+
   // Create directories
   await fs.mkdir(path.join(processesDir, 'bpmn'), { recursive: true });
   await fs.mkdir(path.join(processesDir, 'dmn'), { recursive: true });
   await fs.mkdir(path.join(processesDir, 'cmmn'), { recursive: true });
-  
+
   // Sample Invoice Process BPMN
   const invoiceBpmn = `<?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
@@ -280,7 +285,7 @@ async function createSampleProcesses() {
   // Write sample files
   const invoiceBpmnPath = path.join(processesDir, 'bpmn/invoice.bpmn');
   const invoiceDmnPath = path.join(processesDir, 'dmn/invoice-assign-approver.dmn');
-  
+
   try {
     await fs.access(invoiceBpmnPath);
     console.log('Sample invoice.bpmn already exists');
@@ -288,7 +293,7 @@ async function createSampleProcesses() {
     await fs.writeFile(invoiceBpmnPath, invoiceBpmn);
     console.log('✓ Created sample invoice.bpmn');
   }
-  
+
   try {
     await fs.access(invoiceDmnPath);
     console.log('Sample invoice-assign-approver.dmn already exists');
@@ -306,17 +311,17 @@ async function main() {
   console.log('  Operaton Process Deployment Script');
   console.log('═'.repeat(60));
   console.log(`\nTarget: ${config.baseUrl}\n`);
-  
+
   // Check connection
-  if (!await checkConnection()) {
+  if (!(await checkConnection())) {
     console.error('\nCannot proceed without connection to Operaton');
     process.exit(1);
   }
-  
+
   // Create sample processes if needed
   console.log('\n📁 Checking sample processes...');
   await createSampleProcesses();
-  
+
   // Get existing deployments
   console.log('\n📋 Existing deployments:');
   const existingDeployments = await getExistingDeployments();
@@ -330,24 +335,24 @@ async function main() {
       console.log(`  ... and ${existingDeployments.length - 5} more`);
     }
   }
-  
+
   // Deploy processes
   const results = await deployAllProcesses();
-  
+
   // Summary
-  console.log('\n' + '═'.repeat(60));
+  console.log(`\n${'═'.repeat(60)}`);
   console.log('  Deployment Summary');
   console.log('═'.repeat(60));
   console.log(`  Deployed: ${results.deployed.length}`);
   console.log(`  Failed:   ${results.failed.length}`);
   console.log(`  Skipped:  ${results.skipped.length}`);
-  console.log('═'.repeat(60) + '\n');
-  
+  console.log(`${'═'.repeat(60)}\n`);
+
   if (results.failed.length > 0) {
     console.log('Failed deployments:');
     results.failed.forEach(f => console.log(`  - ${f.name}`));
   }
-  
+
   if (results.skipped.length > 0) {
     console.log('\nSkipped (files not found):');
     results.skipped.forEach(s => console.log(`  - ${s.key}: ${s.reason}`));

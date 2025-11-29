@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 
 /**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright 2025 Operaton
+ *
  * Generate test data for Operaton screenshots
- * 
+ *
  * Creates:
  * - Users and groups
  * - Process instances (running and completed)
@@ -33,12 +36,12 @@ const api = axios.create({
   baseURL: config.baseUrl,
   auth: {
     username: config.username,
-    password: config.password
+    password: config.password,
   },
   headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  }
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
 });
 
 // Track created resources for cleanup
@@ -46,7 +49,7 @@ const createdResources = {
   users: [],
   groups: [],
   processInstances: [],
-  tasks: []
+  tasks: [],
 };
 
 /**
@@ -60,28 +63,34 @@ async function createUser(userData) {
       console.log(`  ⊘ User ${userData.id} already exists`);
       return existing.data;
     }
-    
+
     const response = await api.post('/user/create', {
       profile: {
         id: userData.id,
         firstName: userData.firstName,
         lastName: userData.lastName,
-        email: userData.email
+        email: userData.email,
       },
       credentials: {
-        password: userData.password
-      }
+        password: userData.password,
+      },
     });
-    
+
     console.log(`  ✓ Created user: ${userData.id}`);
     createdResources.users.push(userData.id);
     return response.data;
   } catch (error) {
-    if (error.response?.status === 500 && error.response?.data?.message?.includes('already exists')) {
+    if (
+      error.response?.status === 500 &&
+      error.response?.data?.message?.includes('already exists')
+    ) {
       console.log(`  ⊘ User ${userData.id} already exists`);
       return null;
     }
-    console.error(`  ✗ Failed to create user ${userData.id}:`, error.response?.data?.message || error.message);
+    console.error(
+      `  ✗ Failed to create user ${userData.id}:`,
+      error.response?.data?.message || error.message
+    );
     return null;
   }
 }
@@ -97,22 +106,28 @@ async function createGroup(groupData) {
       console.log(`  ⊘ Group ${groupData.id} already exists`);
       return existing.data;
     }
-    
+
     const response = await api.post('/group/create', {
       id: groupData.id,
       name: groupData.name,
-      type: groupData.type || 'WORKFLOW'
+      type: groupData.type || 'WORKFLOW',
     });
-    
+
     console.log(`  ✓ Created group: ${groupData.id}`);
     createdResources.groups.push(groupData.id);
     return response.data;
   } catch (error) {
-    if (error.response?.status === 500 && error.response?.data?.message?.includes('already exists')) {
+    if (
+      error.response?.status === 500 &&
+      error.response?.data?.message?.includes('already exists')
+    ) {
       console.log(`  ⊘ Group ${groupData.id} already exists`);
       return null;
     }
-    console.error(`  ✗ Failed to create group ${groupData.id}:`, error.response?.data?.message || error.message);
+    console.error(
+      `  ✗ Failed to create group ${groupData.id}:`,
+      error.response?.data?.message || error.message
+    );
     return null;
   }
 }
@@ -127,7 +142,10 @@ async function addUserToGroup(userId, groupId) {
   } catch (error) {
     // Ignore if already member
     if (!error.response?.data?.message?.includes('already member')) {
-      console.error(`  ✗ Failed to add ${userId} to ${groupId}:`, error.response?.data?.message || error.message);
+      console.error(
+        `  ✗ Failed to add ${userId} to ${groupId}:`,
+        error.response?.data?.message || error.message
+      );
     }
   }
 }
@@ -141,22 +159,25 @@ async function startProcessInstance(processKey, variables = {}, businessKey = nu
       variables: Object.fromEntries(
         Object.entries(variables).map(([key, value]) => [
           key,
-          { value, type: typeof value === 'number' ? 'Double' : 'String' }
+          { value, type: typeof value === 'number' ? 'Double' : 'String' },
         ])
-      )
+      ),
     };
-    
+
     if (businessKey) {
       payload.businessKey = businessKey;
     }
-    
+
     const response = await api.post(`/process-definition/key/${processKey}/start`, payload);
-    
+
     console.log(`  ✓ Started process: ${processKey} (${response.data.id})`);
     createdResources.processInstances.push(response.data.id);
     return response.data;
   } catch (error) {
-    console.error(`  ✗ Failed to start ${processKey}:`, error.response?.data?.message || error.message);
+    console.error(
+      `  ✗ Failed to start ${processKey}:`,
+      error.response?.data?.message || error.message
+    );
     return null;
   }
 }
@@ -169,7 +190,7 @@ async function getTasks(assignee = null, candidateGroup = null) {
     const params = {};
     if (assignee) params.assignee = assignee;
     if (candidateGroup) params.candidateGroup = candidateGroup;
-    
+
     const response = await api.get('/task', { params });
     return response.data;
   } catch (error) {
@@ -181,7 +202,7 @@ async function getTasks(assignee = null, candidateGroup = null) {
 /**
  * Claim a task
  */
-async function claimTask(taskId, userId) {
+async function _claimTask(taskId, userId) {
   try {
     await api.post(`/task/${taskId}/claim`, { userId });
     console.log(`  ✓ Claimed task ${taskId} for ${userId}`);
@@ -201,9 +222,9 @@ async function completeTask(taskId, variables = {}) {
       variables: Object.fromEntries(
         Object.entries(variables).map(([key, value]) => [
           key,
-          { value, type: typeof value === 'boolean' ? 'Boolean' : 'String' }
+          { value, type: typeof value === 'boolean' ? 'Boolean' : 'String' },
         ])
-      )
+      ),
     });
     console.log(`  ✓ Completed task ${taskId}`);
     return true;
@@ -248,14 +269,17 @@ async function evaluateDecision(decisionKey, variables) {
       variables: Object.fromEntries(
         Object.entries(variables).map(([key, value]) => [
           key,
-          { value, type: typeof value === 'number' ? 'Double' : 'String' }
+          { value, type: typeof value === 'number' ? 'Double' : 'String' },
         ])
-      )
+      ),
     });
     console.log(`  ✓ Evaluated decision: ${decisionKey}`);
     return response.data;
   } catch (error) {
-    console.error(`  ✗ Failed to evaluate ${decisionKey}:`, error.response?.data?.message || error.message);
+    console.error(
+      `  ✗ Failed to evaluate ${decisionKey}:`,
+      error.response?.data?.message || error.message
+    );
     return null;
   }
 }
@@ -263,60 +287,64 @@ async function evaluateDecision(decisionKey, variables) {
 /**
  * Create test scenario data
  */
-async function createTestScenarios(configData) {
+async function createTestScenarios(_configData) {
   const scenarios = {
     simpleWorkflow: {
       description: 'Basic workflow with tasks',
-      instances: 5
+      instances: 5,
     },
     completedWorkflows: {
       description: 'Completed process instances for history',
-      instances: 10
+      instances: 10,
     },
     tasksForDemo: {
       description: 'Tasks assigned to demo user',
-      count: 5
-    }
+      count: 5,
+    },
   };
-  
+
   const results = {
     instances: [],
     tasks: [],
-    decisions: []
+    decisions: [],
   };
-  
+
   // Get available process definitions
   const definitions = await getProcessDefinitions();
   console.log(`\nFound ${definitions.length} process definition(s)`);
-  
+
   if (definitions.length === 0) {
     console.log('⚠ No process definitions found. Run deploy-processes.js first.');
     return results;
   }
-  
+
   // Find invoice process (or use first available)
   const invoiceProcess = definitions.find(d => d.key === 'invoice') || definitions[0];
-  
+
   console.log(`\n📋 Creating scenarios with process: ${invoiceProcess.key}`);
-  
+
   // Scenario 1: Create active instances
   console.log('\n--- Scenario: Active Process Instances ---');
   for (let i = 0; i < scenarios.simpleWorkflow.instances; i++) {
-    const instance = await startProcessInstance(invoiceProcess.key, {
-      amount: Math.floor(Math.random() * 2000) + 100,
-      creditor: `Vendor ${i + 1}`,
-      invoiceNumber: `INV-${Date.now()}-${i}`,
-      invoiceCategory: ['Travel Expenses', 'Misc', 'Software License'][i % 3]
-    }, `BK-${Date.now()}-${i}`);
-    
+    const instance = await startProcessInstance(
+      invoiceProcess.key,
+      {
+        amount: Math.floor(Math.random() * 2000) + 100,
+        creditor: `Vendor ${i + 1}`,
+        invoiceNumber: `INV-${Date.now()}-${i}`,
+        invoiceCategory: ['Travel Expenses', 'Misc', 'Software License'][i % 3],
+      },
+      `BK-${Date.now()}-${i}`
+    );
+
     if (instance) {
       results.instances.push(instance);
     }
-    
+
     // Small delay to avoid overwhelming the server
     await new Promise(r => setTimeout(r, 200));
   }
-  
+
   // Scenario 2: Create and complete some instances
   console.log('\n--- Scenario: Completed Process Instances ---');
   for (let i = 0; i < Math.min(3, scenarios.completedWorkflows.instances); i++) {
@@ -324,48 +352,49 @@ async function createTestScenarios(configData) {
       amount: 150, // Low amount for auto-approval
       creditor: `Completed Vendor ${i + 1}`,
       invoiceNumber: `INV-COMP-${Date.now()}-${i}`,
-      invoiceCategory: 'Misc'
+      invoiceCategory: 'Misc',
     });
-    
+
     if (instance) {
       // Wait for task to be created
       await new Promise(r => setTimeout(r, 500));
-      
+
       // Get and complete the first task
       const tasks = await getTasks();
       const instanceTask = tasks.find(t => t.processInstanceId === instance.id);
-      
+
       if (instanceTask) {
         await completeTask(instanceTask.id, { approved: true });
       }
     }
-    
+
     await new Promise(r => setTimeout(r, 200));
   }
-  
+
   // Get decision definitions
   const decisions = await getDecisionDefinitions();
   console.log(`\nFound ${decisions.length} decision definition(s)`);
-  
+
   // Evaluate some decisions
   if (decisions.length > 0) {
     console.log('\n--- Scenario: Decision Instances ---');
-    const invoiceDecision = decisions.find(d => d.key === 'invoice-assign-approver') || decisions[0];
-    
+    const invoiceDecision =
+      decisions.find(d => d.key === 'invoice-assign-approver') || decisions[0];
+
     for (let i = 0; i < 3; i++) {
       const result = await evaluateDecision(invoiceDecision.key, {
         amount: [100, 500, 1000][i],
-        invoiceCategory: 'Travel Expenses'
+        invoiceCategory: 'Travel Expenses',
       });
-      
+
       if (result) {
         results.decisions.push(result);
       }
-      
+
       await new Promise(r => setTimeout(r, 200));
     }
   }
-  
+
   return results;
 }
 
@@ -374,22 +403,22 @@ async function createTestScenarios(configData) {
  */
 async function setupUsersAndGroups(configData) {
   console.log('\n👥 Creating users...');
-  
+
   for (const user of configData.users) {
     await createUser(user);
     await new Promise(r => setTimeout(r, 100));
   }
-  
+
   console.log('\n👥 Creating groups...');
-  
+
   for (const group of configData.groups) {
     await createGroup(group);
     await new Promise(r => setTimeout(r, 100));
   }
-  
+
   // Add users to groups
   console.log('\n🔗 Adding users to groups...');
-  
+
   // Demo user to camunda-admin
   await addUserToGroup('demo', 'camunda-admin');
   await addUserToGroup('john', 'accounting');
@@ -401,14 +430,14 @@ async function setupUsersAndGroups(configData) {
  * Generate summary report
  */
 function generateReport(results) {
-  console.log('\n' + '═'.repeat(60));
+  console.log(`\n${'═'.repeat(60)}`);
   console.log('  Data Generation Summary');
   console.log('═'.repeat(60));
   console.log(`  Users created:     ${createdResources.users.length}`);
   console.log(`  Groups created:    ${createdResources.groups.length}`);
   console.log(`  Process instances: ${results.instances.length}`);
   console.log(`  Decisions evaluated: ${results.decisions.length}`);
-  console.log('═'.repeat(60) + '\n');
+  console.log(`${'═'.repeat(60)}\n`);
 }
 
 /**
@@ -419,10 +448,10 @@ async function main() {
   console.log('  Operaton Test Data Generator');
   console.log('═'.repeat(60));
   console.log(`\nTarget: ${config.baseUrl}\n`);
-  
+
   // Load configuration
   const configData = JSON.parse(await fs.readFile(CONFIG_PATH, 'utf8'));
-  
+
   // Test connection
   try {
     await api.get('/engine');
@@ -431,17 +460,17 @@ async function main() {
     console.error('✗ Failed to connect to Operaton:', error.message);
     process.exit(1);
   }
-  
+
   // Setup users and groups
   await setupUsersAndGroups(configData);
-  
+
   // Create test scenarios
   console.log('\n📊 Creating test scenarios...');
   const results = await createTestScenarios(configData);
-  
+
   // Print summary
   generateReport(results);
-  
+
   // Show next steps
   console.log('Next steps:');
   console.log('  1. Verify data in Operaton webapps');

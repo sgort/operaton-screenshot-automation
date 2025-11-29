@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "description": "Screenshot definitions for Operaton documentation",
-  
+
   "defaults": {
     "viewport": { "width": 1920, "height": 1080 },
     "deviceScaleFactor": 2,
@@ -15,7 +15,7 @@
       "baseUrl": "/operaton/app/cockpit/default"
     },
     "tasklist": {
-      "description": "Tasklist webapp screenshots", 
+      "description": "Tasklist webapp screenshots",
       "baseUrl": "/operaton/app/tasklist/default"
     },
     "admin": {
@@ -373,10 +373,34 @@
   },
 
   "users": [
-    { "id": "demo", "firstName": "Demo", "lastName": "Demo", "email": "demo@operaton.org", "password": "demo" },
-    { "id": "john", "firstName": "John", "lastName": "Doe", "email": "john@operaton.org", "password": "john" },
-    { "id": "mary", "firstName": "Mary", "lastName": "Smith", "email": "mary@operaton.org", "password": "mary" },
-    { "id": "peter", "firstName": "Peter", "lastName": "Parker", "email": "peter@operaton.org", "password": "peter" }
+    {
+      "id": "demo",
+      "firstName": "Demo",
+      "lastName": "Demo",
+      "email": "demo@operaton.org",
+      "password": "demo"
+    },
+    {
+      "id": "john",
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john@operaton.org",
+      "password": "john"
+    },
+    {
+      "id": "mary",
+      "firstName": "Mary",
+      "lastName": "Smith",
+      "email": "mary@operaton.org",
+      "password": "mary"
+    },
+    {
+      "id": "peter",
+      "firstName": "Peter",
+      "lastName": "Parker",
+      "email": "peter@operaton.org",
+      "password": "peter"
+    }
   ],
 
   "groups": [
