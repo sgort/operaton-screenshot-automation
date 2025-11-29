@@ -123,6 +123,17 @@ git commit -m "chore(deps): update puppeteer to v24"
 - [ ] Documentation is updated if necessary.
 - [ ] All checks pass in CI/CD.
 
+### Release Process
+
+```bash
+# 1. Merge dev → main via PR
+# 2. Create and push a version tag
+git tag v1.0.0
+git push origin v1.0.0
+
+# 3. GitHub Action creates release automatically
+```
+
 ### 📏 Code Style & Guidelines
 
 - Follow existing code style and conventions.
