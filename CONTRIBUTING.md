@@ -134,8 +134,6 @@ git push origin v1.0.0
 # 3. GitHub Action creates release automatically
 ```
 
-# 3. GitHub Action creates release automatically
-
 ### 📏 Code Style & Guidelines
 
 - Follow existing code style and conventions.
