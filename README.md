@@ -1,7 +1,10 @@
 # ⚠️ Operaton Screenshot Automation ⚠️
 
-[![Work in Progress](https://img.shields.io/badge/status-work%20in%20progress-orange)](https://github.com/operaton/operaton-screenshot-automation)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
+[![status](https://img.shields.io/badge/status-work%20in%20progress-yellow)](https://github.com/sgort/operaton-screenshot-automation)
+[![license](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
+[![release](https://img.shields.io/github/v/release/sgort/operaton-screenshot-automation)](https://github.com/sgort/operaton-screenshot-automation/releases)
+[![CI](https://img.shields.io/github/actions/workflow/status/sgort/operaton-screenshot-automation/ci.yml?branch=dev&label=CI)](https://github.com/sgort/operaton-screenshot-automation/actions/workflows/ci.yml)
+[![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](package.json)
 
 > 🚧 **Work in Progress — Baseline Under Development** 🚧
 >
