@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
 /**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright 2025 Operaton
+ *
  * Show current status of Operaton environment
  */
 
@@ -35,7 +38,7 @@ async function main() {
 
   try {
     await api.get('/engine');
-  } catch (error) {
+  } catch {
     console.error('✗ Cannot connect to Operaton');
     process.exit(1);
   }

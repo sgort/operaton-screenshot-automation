@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * Create intentional incidents for screenshot capture
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright 2025 Operaton
+
+* Create intentional incidents for screenshot capture
  *
  * Generates various error states:
  * - Failed script tasks
@@ -14,7 +17,7 @@
 import 'dotenv/config';
 import axios from 'axios';
 import FormData from 'form-data';
-import fs from 'fs/promises';
+import _fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -99,7 +102,7 @@ async function startProcess(processKey, variables = {}, businessKey = null) {
 
     const response = await api.post(`/process-definition/key/${processKey}/start`, payload);
     return response.data;
-  } catch (error) {
+  } catch {
     // Expected for some error scenarios
     return null;
   }
@@ -112,7 +115,7 @@ async function getIncidents() {
   try {
     const response = await api.get('/incident');
     return response.data;
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -126,7 +129,7 @@ async function getFailedJobs() {
       params: { withException: true },
     });
     return response.data;
-  } catch (error) {
+  } catch {
     return [];
   }
 }

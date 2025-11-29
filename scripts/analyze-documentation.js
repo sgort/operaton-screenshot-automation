@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
 /**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright 2025 Operaton
+ *
  * Analyze documentation to identify screenshots that need replacement
  *
  * This script:
@@ -163,7 +166,7 @@ async function analyzeFile(filePath) {
 /**
  * Find all markdown files in documentation
  */
-async function findMarkdownFiles(docsPath) {
+function findMarkdownFiles(docsPath) {
   const pattern = path.join(docsPath, '**/*.{md,mdx}');
   return glob(pattern, { ignore: ['**/node_modules/**'] });
 }
@@ -250,7 +253,7 @@ Screenshots that need to be replaced with Operaton equivalents:
 `;
 
   // Group by category
-  for (const [category, config] of Object.entries(CATEGORIES)) {
+  for (const [category] of Object.entries(CATEGORIES)) {
     const items = report.replacementPlan.filter(i => i.category === category);
     if (items.length === 0) continue;
 

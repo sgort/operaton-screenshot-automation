@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
 /**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright 2025 Operaton
+ *
  * Capture screenshots of Operaton webapps
  *
  * Uses Puppeteer to:

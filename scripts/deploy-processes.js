@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
 /**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright 2025 Operaton
+ *
  * Deploy BPMN/DMN/CMMN processes to Operaton
  *
  * This script:

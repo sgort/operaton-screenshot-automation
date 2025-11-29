@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
 /**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright 2025 Operaton
+ *
  * Reset Operaton Environment
  *
  * Deletes:
@@ -55,7 +58,7 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 /**
  * Ask for confirmation
  */
-async function confirm(message) {
+function confirm(message) {
   if (forceMode) return true;
 
   const rl = readline.createInterface({
@@ -101,14 +104,14 @@ async function deleteProcessInstances() {
           params: { skipCustomListeners: true, skipIoMappings: true },
         });
         deleted++;
-      } catch (error) {
+      } catch {
         // Try force delete
         try {
           await api.delete(`/process-instance/${instance.id}`, {
             params: { skipCustomListeners: true, skipIoMappings: true, skipSubprocesses: true },
           });
           deleted++;
-        } catch (e) {
+        } catch {
           console.log(`  ⚠ Could not delete instance ${instance.id}`);
         }
       }
@@ -146,7 +149,7 @@ async function deleteHistoricInstances() {
       try {
         await api.delete(`/history/process-instance/${instance.id}`);
         deleted++;
-      } catch (error) {
+      } catch {
         console.log(`  ⚠ Could not delete historic instance ${instance.id}`);
       }
     }
@@ -224,7 +227,7 @@ async function deleteBatches() {
       try {
         await api.delete(`/batch/${batch.id}`, { params: { cascade: true } });
         deleted++;
-      } catch (error) {
+      } catch {
         console.log(`  ⚠ Could not delete batch ${batch.id}`);
       }
     }
@@ -257,14 +260,14 @@ async function deleteHistoricBatches() {
       try {
         await api.delete(`/history/batch/${batch.id}`);
         deleted++;
-      } catch (error) {
+      } catch {
         // Ignore
       }
     }
 
     console.log(`  ✓ Deleted ${deleted} historic batch(es)`);
     return deleted;
-  } catch (error) {
+  } catch {
     return 0;
   }
 }
@@ -337,14 +340,14 @@ async function deleteDecisionInstances() {
       try {
         await api.delete(`/history/decision-instance/${instance.id}`);
         deleted++;
-      } catch (error) {
+      } catch {
         // Some may not be deletable individually
       }
     }
 
     console.log(`  ✓ Deleted ${deleted} decision instance(s)`);
     return deleted;
-  } catch (error) {
+  } catch {
     return 0;
   }
 }
@@ -371,14 +374,14 @@ async function deleteJobs() {
       try {
         await api.delete(`/job/${job.id}`);
         deleted++;
-      } catch (error) {
+      } catch {
         // Some jobs can't be deleted directly
       }
     }
 
     console.log(`  ✓ Deleted ${deleted} job(s)`);
     return deleted;
-  } catch (error) {
+  } catch {
     return 0;
   }
 }

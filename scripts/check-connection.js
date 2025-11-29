@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * Check connection to Operaton instance
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright 2025 Operaton
+
+* Check connection to Operaton instance
  */
 
 import 'dotenv/config';
@@ -56,7 +59,7 @@ async function checkWebApps() {
   for (const app of apps) {
     const url = `${config.webUrl}/operaton/app/${app}/default/`;
     try {
-      const response = await axios.get(url, {
+      const _response = await axios.get(url, {
         timeout: 10000,
         maxRedirects: 5,
       });

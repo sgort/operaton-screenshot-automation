@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
 /**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright 2025 Operaton
+ *
  * Simulate various process scenarios for screenshot capture
  *
  * Creates:
@@ -13,7 +16,7 @@
 
 import 'dotenv/config';
 import axios from 'axios';
-import fs from 'fs/promises';
+import _fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -100,7 +103,7 @@ async function getTasksForInstance(processInstanceId) {
       params: { processInstanceId },
     });
     return response.data;
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -133,11 +136,11 @@ async function completeTask(taskId, variables = {}) {
 /**
  * Claim a task
  */
-async function claimTask(taskId, userId) {
+async function _claimTask(taskId, userId) {
   try {
     await api.post(`/task/${taskId}/claim`, { userId });
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 }
@@ -149,7 +152,7 @@ async function setTaskDueDate(taskId, dueDate) {
   try {
     await api.put(`/task/${taskId}`, { dueDate });
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 }
@@ -161,7 +164,7 @@ async function getActivityInstances(processInstanceId) {
   try {
     const response = await api.get(`/process-instance/${processInstanceId}/activity-instances`);
     return response.data;
-  } catch (error) {
+  } catch {
     return null;
   }
 }

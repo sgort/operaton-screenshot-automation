@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
 /**
+ * SPDX-License-Identifier: Apache-2.0
+ * Copyright 2025 Operaton
+ *
  * Generate test data for Operaton screenshots
  *
  * Creates:
@@ -199,7 +202,7 @@ async function getTasks(assignee = null, candidateGroup = null) {
 /**
  * Claim a task
  */
-async function claimTask(taskId, userId) {
+async function _claimTask(taskId, userId) {
   try {
     await api.post(`/task/${taskId}/claim`, { userId });
     console.log(`  ✓ Claimed task ${taskId} for ${userId}`);
@@ -284,7 +287,7 @@ async function evaluateDecision(decisionKey, variables) {
 /**
  * Create test scenario data
  */
-async function createTestScenarios(configData) {
+async function createTestScenarios(_configData) {
   const scenarios = {
     simpleWorkflow: {
       description: 'Basic workflow with tasks',
