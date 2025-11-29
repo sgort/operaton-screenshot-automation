@@ -30,19 +30,16 @@
     "reset:deployments": "node scripts/reset-environment.js --deployments-only",
     "quick": "npm run deploy && npm run data && npm run capture",
     "full": "npm run deploy && npm run data && npm run simulate && npm run incidents && npm run capture",
-
     "lint": "eslint scripts/",
     "lint:fix": "eslint scripts/ --fix",
     "format": "prettier --write \"scripts/**/*.js\" \"config/**/*.json\" \"*.md\"",
     "format:check": "prettier --check \"scripts/**/*.js\" \"config/**/*.json\" \"*.md\"",
     "validate": "npm run lint && npm run format:check",
-
     "deps:check": "ncu",
     "deps:update": "ncu -u && npm install",
     "deps:update:minor": "ncu -u --target minor && npm install",
     "deps:audit": "npm audit",
     "deps:audit:fix": "npm audit fix",
-
     "prepare": "husky || true",
     "test": "echo \"No tests yet\" && exit 0"
   },
