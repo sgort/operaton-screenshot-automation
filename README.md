@@ -144,30 +144,30 @@ The configuration file defines:
 
 ```
 operaton-screenshot-automation/
-├── Makefile                    # Command interface
-├── package.json               # Node.js dependencies
-├── .env.example               # Environment template
+├── Makefile                            # Command interface
+├── package.json                        # Node.js dependencies
+├── .env.example                        # Environment template
 ├── config/
-│   └── screenshots.json       # Screenshot definitions
+│   └── screenshots.json                # Screenshot definitions
 ├── processes/
-│   ├── bpmn/                  # BPMN process files
-│   │   └── invoice.bpmn       # Sample invoice process
-│   ├── dmn/                   # DMN decision files
+│   ├── bpmn/                           # BPMN process files
+│   │   └── invoice.bpmn                # Sample invoice process
+│   ├── dmn/                            # DMN decision files
 │   │   ├── invoice-assign-approver.dmn
 │   │   └── dish-decision.dmn
-│   └── cmmn/                  # CMMN case files
+│   └── cmmn/                           # CMMN case files
 ├── scripts/
-│   ├── check-connection.js    # Connection checker
-│   ├── show-status.js         # Status display
-│   ├── deploy-processes.js    # Process deployment
-│   ├── generate-data.js       # Data generation
-│   ├── simulate-scenarios.js  # Scenario simulation
-│   ├── create-incidents.js    # Incident creation
-│   ├── capture-screenshots.js # Screenshot capture
-│   ├── analyze-documentation.js # Doc analyzer
-│   └── reset-environment.js   # Environment reset
+│   ├── check-connection.js             # Connection checker
+│   ├── show-status.js                  # Status display
+│   ├── deploy-processes.js             # Process deployment
+│   ├── generate-data.js                # Data generation
+│   ├── simulate-scenarios.js           # Scenario simulation
+│   ├── create-incidents.js             # Incident creation
+│   ├── capture-screenshots.js          # Screenshot capture
+│   ├── analyze-documentation.js        # Doc analyzer
+│   └── reset-environment.js            # Environment reset
 └── output/
-    └── screenshots/           # Captured screenshots
+    └── screenshots/                    # Captured screenshots
 ```
 
 ## Simulation Scenarios
@@ -282,4 +282,4 @@ make capture-debug  # Run with visible browser
 
 ## License
 
-MIT
+Licensed under the Apache License, Version 2.0. See the LICENSE file for details.
