@@ -43,6 +43,7 @@ make check
 ### Before Making Changes
 
 1. Create a new branch from `main`:
+
    ```bash
    git checkout -b feat/your-feature-name
    # or
@@ -71,11 +72,13 @@ make check
 
 ### Commit Messages
 
-We use [Conventional Commits](https://www.conventionalcommits.org/). The commit-msg hook will validate your messages.
+We use [Conventional Commits](https://www.conventionalcommits.org/). The commit-msg hook will
+validate your messages.
 
 Format: `type(scope): description`
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -89,6 +92,7 @@ Format: `type(scope): description`
 - `revert`: Reverting changes
 
 **Examples:**
+
 ```bash
 git commit -m "feat(capture): add support for custom viewport sizes"
 git commit -m "fix(deploy): handle timeout errors gracefully"
@@ -99,6 +103,7 @@ git commit -m "chore(deps): update puppeteer to v24"
 ### Submitting Changes
 
 1. Push your branch:
+
    ```bash
    git push origin feat/your-feature-name
    ```
@@ -168,6 +173,7 @@ make deps-audit-fix       # Auto-fix where possible
 Currently, the project doesn't have automated tests. Contributions to add testing are welcome!
 
 Manual testing checklist:
+
 - [ ] `make check` - Connection works
 - [ ] `make deploy` - Processes deploy successfully
 - [ ] `make data` - Data generates correctly
@@ -185,6 +191,7 @@ Manual testing checklist:
 ## Questions?
 
 Feel free to open an issue for:
+
 - Bug reports
 - Feature requests
 - Questions about the codebase
