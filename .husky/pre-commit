@@ -1,7 +1,5 @@
 #!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
 
 # Run lint-staged for code quality
 npx lint-staged
-
-# Exit with lint-staged's exit code
-exit $?
