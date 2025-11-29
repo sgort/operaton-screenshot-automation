@@ -1,4 +1,4 @@
-# ⚠️ Operaton Documentation Screenshot Automation ⚠️
+# ⚠️ Operaton Screenshot Automation ⚠️
 
 [![Work in Progress](https://img.shields.io/badge/status-work%20in%20progress-orange)](https://github.com/operaton/operaton-screenshot-automation)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
