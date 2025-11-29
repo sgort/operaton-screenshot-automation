@@ -1,6 +1,7 @@
 # Contributing Guide
 
-Thank you for your interest in contributing to the Operaton Screenshot Automation toolkit!
+First off, thank you for considering contributing! 💚 Your efforts help make this project better for
+everyone.
 
 ## Development Setup
 
@@ -18,10 +19,10 @@ git clone <repository-url>
 cd operaton-screenshot-automation
 
 # Install dependencies
-npm install
+make install
 
 # Set up git hooks
-npm run prepare
+make setup
 
 # Copy environment file
 cp .env.example .env
@@ -38,22 +39,63 @@ make validate
 make check
 ```
 
-## Development Workflow
+## 🌿 Git Branching & Contribution Workflow
 
-### Before Making Changes
+This repository uses a **protected branching workflow** to ensure stable baselines and safe
+development.
 
-1. Create a new branch from `main`:
+### Branches Overview
 
-   ```bash
-   git checkout -b feat/your-feature-name
-   # or
-   git checkout -b fix/your-bug-fix
-   ```
+| Branch        | Purpose                                     | Rules                                                               |
+| ------------- | ------------------------------------------- | ------------------------------------------------------------------- |
+| `main`        | Production-ready, stable branch             | Protected: only updated via PR from `dev`                           |
+| `dev`         | Default integration branch for ongoing work | Protected: only updated via PR from feature/bug/chore/docs branches |
+| `feature/...` | New features                                | Branch off `dev`, PR back into `dev`                                |
+| `bug/...`     | Bug fixes                                   | Branch off `dev`, PR back into `dev`                                |
+| `chore/...`   | Maintenance, setup, tooling                 | Branch off `dev`, PR back into `dev`                                |
+| `docs/...`    | Documentation updates                       | Branch off `dev`, PR back into `dev`                                |
 
-2. Make sure you're starting with clean code:
-   ```bash
-   make validate
-   ```
+### Visual Workflow
+
+```text
+feature/xxx, bug/xxx, chore/xxx, docs/xxx
+           \
+            ──> PR ──> dev (default branch, WIP baseline)
+                              \
+                               ──> PR ──> main (protected stable)
+```
+
+## 📏 Code Style & Guidelines
+
+- Follow existing code style and conventions.
+- Use meaningful variable and function names.
+- Keep commits small and focused.
+- Write tests for new features or bug fixes when applicable.
+- Run all tests before creating a PR.
+
+---
+
+## 📝 Documentation
+
+- Update the README or other relevant docs if your change affects usage.
+- Use `docs/...` branches for documentation-only changes.
+
+---
+
+## ✅ Pull Request Checklist
+
+- [ ] Branch off `dev`.
+- [ ] PR targets `dev` (except hotfixes targeting `main` in emergencies).
+- [ ] Make sure you're starting with clean code:
+  ```bash
+  make validate
+  ```
+- [ ] Commit messages follow the style guide.
+- [ ] Code is linted and passes all tests.
+- [ ] Documentation is updated if necessary.
+- [ ] All checks pass in CI/CD.
+
+---
 
 ### Making Changes
 
